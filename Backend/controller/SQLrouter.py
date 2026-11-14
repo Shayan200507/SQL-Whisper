@@ -143,6 +143,7 @@ def generate_response(prompt: str, schema: str) -> str:
         f"Database schema:\n{schema}\n\n"
         f"Question: {prompt}"
     )
+    
     return generate_sql(tuned_model, instruction)
 
 
@@ -154,6 +155,7 @@ def prompt_database(request: PromptRequest, database_id: int = Path(gt=0)):
     except psycopg.Error:
         raise HTTPException(status_code=502, detail="Could not fetch database schema") from None
     response = generate_response(request.prompt, schema)
+    print(response)
     try:
         with connect_database(config) as conn:
             conn.read_only = True

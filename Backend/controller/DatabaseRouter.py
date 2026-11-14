@@ -22,11 +22,47 @@ class DatabaseConnection(BaseModel):
 
 
 class DatabaseEntryCreate(DatabaseConnection):
-    user_id: str = Field(min_length=1, pattern=r"\S")
+    pass
+
+
 
 
 class DatabaseEntryCreated(BaseModel):
     id: int
+
+
+@DatabaseRouter.get("/getEntries")
+def getEntries():
+
+    try:
+        with closing(sqlite3.connect(DATABASE_PATH)) as connection:
+            with connection:
+             
+
+                cursor = connection.execute("""
+
+                    SELECT id,host,port,dbname,username,created_at FROM database_credentials;
+
+
+                """
+                )
+
+                columns = [column[0] for column in cursor.description]
+                rows = cursor.fetchall()
+
+                return [dict(zip(columns, row)) for row in rows]
+
+
+
+    except sqlite3.Error:
+         raise HTTPException(
+                    status_code=500, detail="Could not save database credentials")
+    
+                
+
+
+
+
 
 
 @DatabaseRouter.post(
@@ -45,7 +81,7 @@ def creatingEntry(config: DatabaseEntryCreate):
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
-                        config.user_id, config.host, config.port, config.dbname,
+                        "local", config.host, config.port, config.dbname,
                         config.username, config.password, config.sslmode,
                     ),
                 )
@@ -58,14 +94,19 @@ def creatingEntry(config: DatabaseEntryCreate):
 
 
 def connect_database(config:DatabaseConnection):
-    return psycopg.connect(
+    try:
+        return psycopg.connect(
         host=config.host,
         port=config.port,
         dbname=config.dbname,
         user=config.username,
         password=config.password,
-        sslmode=config.sslmode
+        sslmode=config.sslmode,
+        connect_timeout=5
     )
+    except psycopg.OperationalError as e:
+        print("Connection error:", repr(e), flush=True)
+        raise
 
     
 
@@ -129,6 +170,8 @@ def get_schema(config: DatabaseConnection) -> str:
     for table_id, definition in constraints:
         if table_id in tables:
             tables[table_id]["parts"].append(definition)
+
+    print("we got the schema")        
 
     return "\n".join(
         f"CREATE TABLE {table['name']} ({', '.join(table['parts'])});"
