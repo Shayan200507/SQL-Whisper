@@ -224,13 +224,3 @@ npm run lint
 | Browser reports a CORS error | Use frontend port `5173`, backend port `8000`, and restart FastAPI after changing CORS settings. |
 | Query returns an error | Check the connection, table permissions, and question. Model-generated SQL can be invalid. |
 
-## Current limitations
-
-- Connection passwords are stored as plain text in the local SQLite file `Backend/database/credentials.db`. Keep that file out of version control.
-- There is no authentication or per-user authorization. Run this as a local development app, not an exposed multi-user service.
-- Schema extraction currently covers tables in `public`.
-- Prompts are truncated to 1,024 tokens, and generation is limited to 256 new tokens. Large schemas or long queries may be cut off.
-- Query results use `fetchall()` without pagination or a row cap. Ask for bounded results when exploring large tables.
-- Read-only execution does not establish SQL correctness or make arbitrary generated queries a complete security sandbox. Use a database role with only the permissions needed.
-- API URLs and allowed origins are configured for local development; update them before deployment.
-- Keep virtual environments and training checkpoints out of Git. Large adapter weights may need separate artifact storage.
