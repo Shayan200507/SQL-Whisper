@@ -1,0 +1,9 @@
+# Connection settings for the backend running on your computer.
+# These credentials match docker-compose.yaml and are for local development.
+# If the backend joins the Compose network, use postgres as the host instead.
+database:
+  host: localhost
+  port: 5532
+  name: sqlwhisper
+  user: sqlwhisper
+  password: local_dev_password
