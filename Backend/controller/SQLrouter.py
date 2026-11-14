@@ -29,8 +29,8 @@ from transformers import (
 from peft import PeftModel
 
 ADAPTER_PATH = (
-    FilePath(__file__).resolve().parents[2]
-    / "model-tuning" / ".venv" / "qwen-lora-tuned-sql"
+    FilePath(__file__).resolve().parents[1]
+    / "models" / "qwen-lora-tuned-sql"
 )
 
 model_name = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
